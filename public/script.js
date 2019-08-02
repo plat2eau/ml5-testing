@@ -2,7 +2,7 @@
 const puppeteer = require('puppeteer');
 
 var mobilenet;
-var classifier;
+var regressor;
 var param = 90;
 let img;
 let data;
@@ -21,12 +21,12 @@ function modelReady() {
     console.log('Model loaded');
 }
 
-function customclassifier() {
-    console.log("custom classifier is loaded");
+function customregressor() {
+    console.log("custom regressor is loaded");
 }
 
-function classifierReady() {
-    console.log("classifier is loaded");
+function regressorReady() {
+    console.log("regressor is loaded");
     //If you want to load a pre-trained model at the start
 }
 
@@ -147,11 +147,11 @@ function wait(time) {
 
 async function setDependencies() {
 
-    //Classifier initialization
+    //regressor initialization
     const options = { version: 1, epochs: 20, numLabels: 5, batchSize: 0.5 };
     mobilenet = ml5.featureExtractor('MobileNet', options, modelReady);
-    classifier = mobilenet.classification(classifierReady);
-    classifier.load('model.json', customclassifier);
+    regressor = mobilenet.regression(regressorReady);
+    regressor.load('model.json', customregressor);
 
     //Anchor tag for automatoic download
     autoDownloadAnchor = document.createElement("a");
@@ -183,10 +183,11 @@ async function setDependencies() {
 function testModel(img, url) {
     // Get a prediction for that image ans save results
     document.body.appendChild(img)
-    classifier.classify(img, function(err, result) {
+    regressor.predict(img, function(err, result) {
         //accepts P-5 Image element or HTML image element as "img"
         var temp = [];
         var temp1 = [];
+        console.log(result);
         result.forEach(line => {
             temp1.push(line.label);
             temp1.push((Math.round(line.confidence * 10000) / 100))
